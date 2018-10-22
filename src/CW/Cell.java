@@ -1,21 +1,17 @@
 package CW;
 
 public class Cell {
-    int coord_i;
-    int coord_j;
     boolean visited;
-    Cell leftCell;
-    Cell upCell;
-    Cell rightCell;
-    Cell downCell;
-    boolean leftWall = true;
-    boolean upWall = true;
-    boolean rightWall = true;
-    boolean downWall = true;
+    private Cell leftCell;
+    private Cell upCell;
+    private Cell rightCell;
+    private Cell downCell;
+    private boolean leftWall;
+    private boolean upWall;
+    private boolean rightWall;
+    private boolean downWall;
 
-    void init(int i, int j) {
-        coord_i = i;
-        coord_j = j;
+    Cell() {
         visited = false;
         leftCell = null;
         upCell = null;
@@ -27,63 +23,51 @@ public class Cell {
         downWall = true;
     }
 
-    void makePair(Cell cell2) {
-        if (this.coord_i == cell2.coord_i) {
-            if (this.coord_j < cell2.coord_j) {
-                this.rightCell = cell2;
-                cell2.leftCell = this;
-            } else {
-                this.leftCell = cell2;
-                cell2.rightCell = this;
-            }
-        } else if (this.coord_j == cell2.coord_j) {
-            if (this.coord_i < cell2.coord_i) {
-                this.downCell = cell2;
-                cell2.upCell = this;
-            } else {
-                this.upCell = cell2;
-                cell2.downCell = this;
-            }
-        }
+    Cell addToRight(Cell cell2){
+        this.rightCell = cell2;
+        cell2.leftCell = this;
+        return cell2;
+    }
+
+    Cell addToDown(Cell cell2){
+        this.downCell = cell2;
+        cell2.upCell = this;
+        return cell2;
     }
 
     void makeWall(Cell cell2) {
-        if (this.coord_i == cell2.coord_i) {
-            if (this.coord_j < cell2.coord_j) {
-                this.rightWall = true;
-                cell2.leftWall = true;
-            } else {
-                this.leftWall = true;
-                cell2.rightWall = true;
-            }
-        } else if (this.coord_j == cell2.coord_j) {
-            if (this.coord_i < cell2.coord_i) {
-                this.downWall = true;
-                cell2.upWall = true;
-            } else {
-                this.upWall = true;
-                cell2.downWall = true;
-            }
+        if (leftCell != null && leftCell == cell2) {
+            leftWall = true;
+            cell2.rightWall = true;
+        } else if (upCell != null && upCell == cell2){
+            upWall = true;
+            cell2.downWall = true;
+        } else if (rightCell != null && rightCell == cell2) {
+            rightWall = true;
+            cell2.leftWall = true;
+        } else if (downCell != null && downCell == cell2){
+            downWall = true;
+            cell2.upWall = true;
+        } else {
+            System.out.println("Странное поведение метода Cell.makeWall");
         }
     }
 
     void makePass(Cell cell2) {
-        if (this.coord_i == cell2.coord_i) {
-            if (this.coord_j < cell2.coord_j) {
-                this.rightWall = false;
-                cell2.leftWall = false;
-            } else {
-                this.leftWall = false;
-                cell2.rightWall = false;
-            }
-        } else if (this.coord_j == cell2.coord_j) {
-            if (this.coord_i < cell2.coord_i) {
-                this.downWall = false;
-                cell2.upWall = false;
-            } else {
-                this.upWall = false;
-                cell2.downWall = false;
-            }
+        if (leftCell == cell2) {
+            leftWall = false;
+            cell2.rightWall = false;
+        } else if (upCell == cell2){
+            upWall = false;
+            cell2.downWall = false;
+        } else if (rightCell == cell2) {
+            rightWall = false;
+            cell2.leftWall = false;
+        } else if (downCell == cell2){
+            downWall = false;
+            cell2.upWall = false;
+        } else {
+            System.out.println("Странное поведение метода Cell.makePass");
         }
     }
 
@@ -98,7 +82,7 @@ public class Cell {
 
     boolean isThereUnvisitedNeighborsG() { //Вариант функции для генератора лабиринтов
         boolean yes = false;
-        if (leftCell != null) yes = yes || !leftCell.visited;
+        if (leftCell != null) yes = yes || !leftCell.visited; //yes всегда ложное?
         if (upCell != null) yes = yes || !upCell.visited;
         if (rightCell != null) yes = yes || !rightCell.visited;
         if (downCell != null) yes = yes || !downCell.visited;
@@ -357,11 +341,4 @@ public class Cell {
         }
         return null;
     }
-
-    @Override
-    public String toString() {
-        return "(" + coord_i + "," + coord_j + ")";
-    }
-
-
 }

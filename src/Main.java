@@ -1,12 +1,14 @@
 import CW.Maze;
+import CW.Generator;
+//import CW.PathFinder;
 
 public class Main {
 
     public static void main(String[] args) {
-        Maze maze = new Maze(10, 15);
+        Maze maze = new Maze(5, 5);
         maze.print();
-        maze.serialGenerator();
+        Generator.serialGenerator(maze);
         maze.print();
-        maze.serialPathFinder();
+//        PathFinder.serialPathFinder(maze);
     }
 }
