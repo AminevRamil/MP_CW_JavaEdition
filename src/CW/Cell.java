@@ -1,6 +1,6 @@
 package CW;
 
-public class Cell {
+class Cell {
     boolean visited;
     private Cell leftCell;
     private Cell upCell;
@@ -82,7 +82,7 @@ public class Cell {
 
     boolean isThereUnvisitedNeighborsG() { //Вариант функции для генератора лабиринтов
         boolean yes = false;
-        if (leftCell != null) yes = yes || !leftCell.visited; //yes всегда ложное?
+        if (leftCell != null) yes = !leftCell.visited; //yes всегда ложное?
         if (upCell != null) yes = yes || !upCell.visited;
         if (rightCell != null) yes = yes || !rightCell.visited;
         if (downCell != null) yes = yes || !downCell.visited;
@@ -91,7 +91,7 @@ public class Cell {
 
     boolean isThereUnvisitedNeighborsPF() { //Вариант функции для поиска пути
         boolean yes = false;
-        if (leftCell != null) yes = yes || (!leftCell.visited && !leftWall); //обдумать порядок действий
+        if (leftCell != null) yes = !leftCell.visited && !leftWall; //обдумать порядок действий
         if (upCell != null) yes = yes || (!upCell.visited && !upWall);
         if (rightCell != null) yes = yes || (!rightCell.visited && !rightWall);
         if (downCell != null) yes = yes || (!downCell.visited && !downWall);

@@ -2,9 +2,9 @@ package CW;
 
 import java.util.Stack;
 
-public class Generator {
+public class Generator implements Runnable {
 
-    public static void serialGenerator(Maze maze) {
+    private static void serialGenerator(Maze maze) {
         System.out.println("Начало генерации лабиринта");
         int size_h = maze.getSize_h();
         int size_w = maze.getSize_w();
@@ -32,6 +32,17 @@ public class Generator {
         }
         maze.makeAllUnvisited();
         System.out.println("Лабиринт сгенерирован");
+    }
+
+    private Maze targetMaze = null;
+
+    public void setTargetMaze(Maze maze){
+        targetMaze = maze;
+    }
+
+    @Override
+    public void run() {
+        serialGenerator(targetMaze);
     }
 }
 
