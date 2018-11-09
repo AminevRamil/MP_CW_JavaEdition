@@ -1,48 +1,74 @@
 package CW;
 
 import java.util.Stack;
+import java.util.concurrent.TimeUnit;
 
 public class Generator implements Runnable {
 
-    private static void serialGenerator(Maze maze) {
+    public static void serialGenerator(Maze maze) {
         System.out.println("Начало генерации лабиринта");
-        int size_h = maze.getSize_h();
-        int size_w = maze.getSize_w();
 
-        Cell currentCell = maze.getRandomCell();
+        Cell currentCell = maze.getCellAt(0, 0);
+        Cell startingCell = maze.getCellAt(0, 0);
         currentCell.visited = true;
-        int unvisited = size_h * size_w - 1;
-        Stack<Cell> stack = new Stack<>(); //инициализация?
+        Stack<Cell> stack = new Stack<>();
 
-        while (unvisited > 0) {
+        do if (currentCell.isThereUnvisitedNeighborsG()) {
+            stack.push(currentCell);
+            Cell randNeighbor = currentCell.getUnvisitedNeighborG();
+            currentCell.makePass(randNeighbor);
+            randNeighbor.visited = true;
+            currentCell = randNeighbor;
+        } else if (!stack.empty()) {
+            currentCell = stack.peek();
+            stack.pop();
+        }
+        while (currentCell != startingCell);
+        maze.makeAllUnvisited();
+        System.out.println("Лабиринт сгенерирован");
+    }
+
+    private static Maze targetMaze = null;
+
+    public void setTargetMaze(Maze maze) {
+        targetMaze = maze;
+    }
+
+    private void parallelGenerator(Maze maze, int x0, int y0) throws InterruptedException {
+        System.out.println("Начало генерации в точке (" + x0 + "," + y0 + ") потоком " + Thread.currentThread().getName());
+
+        Cell currentCell = maze.getCellAt(0, 0);
+        Cell startingCell = maze.getCellAt(0, 0);
+        currentCell.visited = true;
+        Stack<Cell> stack = new Stack<>();
+
+        do {
             if (currentCell.isThereUnvisitedNeighborsG()) {
                 stack.push(currentCell);
                 Cell randNeighbor = currentCell.getUnvisitedNeighborG();
                 currentCell.makePass(randNeighbor);
                 randNeighbor.visited = true;
-                unvisited--;
                 currentCell = randNeighbor;
             } else if (!stack.empty()) {
                 currentCell = stack.peek();
                 stack.pop();
-            } else {
-                System.out.println("What?");
-                break;
             }
-        }
-        maze.makeAllUnvisited();
-        System.out.println("Лабиринт сгенерирован");
-    }
+//            TimeUnit.SECONDS.sleep(1);
+//            maze.print();
+        } while (currentCell != startingCell);
 
-    private Maze targetMaze = null;
 
-    public void setTargetMaze(Maze maze){
-        targetMaze = maze;
+        System.out.println("Поток " + Thread.currentThread().getName() + " завершил работу");
     }
 
     @Override
-    public void run() {
-        serialGenerator(targetMaze);
+    public void run(){
+        try {
+            parallelGenerator(targetMaze, 0, 0);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
     }
 }
 
