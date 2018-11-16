@@ -53,7 +53,7 @@ class Cell {
         }
     }
 
-    void makePass(Cell cell2) {
+    synchronized void makePass(Cell cell2) {
         if (leftCell == cell2) {
             leftWall = false;
             cell2.rightWall = false;
@@ -80,7 +80,7 @@ class Cell {
         return code;
     }
 
-    boolean isThereUnvisitedNeighborsG() { //Вариант функции для генератора лабиринтов
+    synchronized boolean isThereUnvisitedNeighborsG() { //Вариант функции для генератора лабиринтов
         boolean yes = false;
         if (leftCell != null) yes = !leftCell.visited; //yes всегда ложное?
         if (upCell != null) yes = yes || !upCell.visited;

@@ -9,28 +9,24 @@ import java.util.concurrent.TimeUnit;
 public class Main {
 
     public static void main(String[] args) throws InterruptedException {
-        Maze maze = new Maze(4, 4);
+        Maze maze = new Maze(Integer.parseInt(args[0]), Integer.parseInt(args[0]));
 
-        Scanner in = new Scanner(System.in);
-        System.out.print("Тип генератора:\n0 - последовательный\n1 - паралельный\n>");
-        int choice = in.nextInt();
-        switch (choice){
+        switch (Integer.parseInt(args[1])){
             case 0:
                 long startTime = System.currentTimeMillis();
                 Generator.serialGenerator(maze);
                 long endTime = System.currentTimeMillis();
-                //System.out.println("Время выполнения: " + (endTime - startTime) + "мс");
-                maze.print();
+                System.out.println("Время выполнения: " + (endTime - startTime) + "мс");
+                //maze.print();
                 break;
             case 1:
                 Runnable parGen1 = new Generator();
-                Runnable parGen2 = new Generator();
                 ((Generator) parGen1).setTargetMaze(maze);
-                ((Generator) parGen2).setTargetMaze(maze);
+                ((Generator) parGen1).setTargetMaze(maze);
                 Thread thread1 = new Thread(parGen1);
-                Thread thread2 = new Thread(parGen2);
+                Thread thread2 = new Thread(parGen1);
 
-                TimeUnit.SECONDS.sleep(1);
+                TimeUnit.MILLISECONDS.sleep(100);
 
                 startTime = System.currentTimeMillis();
 
@@ -40,8 +36,8 @@ public class Main {
                 thread1.join();
                 thread2.join();
                 endTime = System.currentTimeMillis();
-                //System.out.println("Время выполнения: " + (endTime - startTime) + "мс");
-                maze.print();
+                System.out.println("Время выполнения: " + (endTime - startTime) + "мс");
+                //maze.print();
                 break;
         }
 
