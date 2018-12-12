@@ -1,5 +1,7 @@
 package CW;
 
+import java.util.Stack;
+
 public class Maze {
     private int size_h;
     private int size_w;
@@ -44,11 +46,12 @@ public class Maze {
         return size_w;
     }
 
-    Cell getCellAt(int i, int j){
+    public Cell getCellAt(int i, int j){
         return maze[i][j];
     }
 
-    public void print() {
+
+    public synchronized void print() {
         for (int i = 0; i < size_h; i++) {
             for (int j = 0; j < size_w; j++) {
                 switch (maze[i][j].wallCode()) {
@@ -114,11 +117,4 @@ public class Maze {
         }
     }
 
-
-    Cell getRandomCell() {
-        int i = (int)(Math.random() * size_h);
-        int j = (int)(Math.random() * size_w);
-        System.out.println("Выдана случайная клетка: " + i + ", " + j);
-        return maze[i][j];
-    }
 }

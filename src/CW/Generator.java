@@ -1,19 +1,22 @@
 package CW;
 
 import java.util.Stack;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-public class Generator implements Runnable {
+public class Generator{
 
-    public static void serialGenerator(Maze maze) {
+    public long serialGenerator(Maze maze) {
         System.out.println("Начало генерации лабиринта");
-
+        long start = System.currentTimeMillis();
         Cell currentCell = maze.getCellAt(0, 0);
         Cell startingCell = maze.getCellAt(0, 0);
         currentCell.visited = true;
         Stack<Cell> stack = new Stack<>();
 
-        do if (currentCell.isThereUnvisitedNeighborsG()) {
+        do if (currentCell.isThereUnvisitedNeighborsG() != 0) {
             stack.push(currentCell);
             Cell randNeighbor = currentCell.getUnvisitedNeighborG();
             currentCell.makePass(randNeighbor);
@@ -24,26 +27,70 @@ public class Generator implements Runnable {
             stack.pop();
         }
         while (currentCell != startingCell);
+        long end = System.currentTimeMillis();
         maze.makeAllUnvisited();
         System.out.println("Лабиринт сгенерирован");
+        return end - start;
     }
 
-    private static Maze targetMaze = null;
-
-    public void setTargetMaze(Maze maze) {
-        targetMaze = maze;
+    public long startParallel(Maze maze) {
+        long start = System.currentTimeMillis();
+        final Cell staringCell = maze.getCellAt(0,0);
+        try {
+            service.submit(() -> {
+                try {
+                    parallelGenerator(maze, staringCell);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            });
+            latch.await();
+            long end = System.currentTimeMillis();
+            return end - start;
+        } catch (NullPointerException e){
+            e.printStackTrace();
+            return -2;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            return -1;
+        }
     }
 
-    private void parallelGenerator(Maze maze, int x0, int y0) throws InterruptedException {
-        System.out.println("Начало генерации в точке (" + x0 + "," + y0 + ") потоком " + Thread.currentThread().getName());
+    static private volatile int workingThreads = 0;
+    static final private int MAX_THREADS = 4;
+    CountDownLatch latch = new CountDownLatch(0);
+    private ExecutorService service = Executors.newFixedThreadPool(4);
+    //добавить статичный пул потоков
 
-        Cell currentCell = maze.getCellAt(0, 0);
-        Cell startingCell = maze.getCellAt(0, 0);
+    public void parallelGenerator(Maze maze, Cell startingCell) throws InterruptedException {
+        //workingThreads++;
+        //System.out.println("Начало генерации потоком " + Thread.currentThread().getName());
+        latch.countDown();
+
+        Cell currentCell = startingCell;
         currentCell.visited = true;
         Stack<Cell> stack = new Stack<>();
+        int count = 0;
 
         do {
-            if (currentCell.isThereUnvisitedNeighborsG()) {
+            int numOfNeighbors = currentCell.isThereUnvisitedNeighborsG();
+
+            if (numOfNeighbors > 1 && workingThreads <= MAX_THREADS && count == 5) {
+
+                final Cell newStartingCell = currentCell.getUnvisitedNeighborG();
+                newStartingCell.visited = true;
+                currentCell.makePass(newStartingCell);
+
+                service.submit(() -> {
+                    try {
+                        parallelGenerator(maze, newStartingCell);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                });
+            }
+
+            if (numOfNeighbors != 0) {
                 stack.push(currentCell);
                 Cell randNeighbor = currentCell.getUnvisitedNeighborG();
                 currentCell.makePass(randNeighbor);
@@ -53,22 +100,16 @@ public class Generator implements Runnable {
                 currentCell = stack.peek();
                 stack.pop();
             }
-//            TimeUnit.SECONDS.sleep(1);
-//            maze.print();
+
+            if (count == 10) count = 0;
+            else count++;
+
+            //TimeUnit.SECONDS.sleep(1);
+            //maze.print();
         } while (currentCell != startingCell);
 
-
-        System.out.println("Поток " + Thread.currentThread().getName() + " завершил работу");
-    }
-
-    @Override
-    public void run(){
-        try {
-            parallelGenerator(targetMaze, 0, 0);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
+        //workingThreads--;
+        //System.out.println("Поток " + Thread.currentThread().getName() + " завершил работу");
     }
 }
 

@@ -80,13 +80,13 @@ class Cell {
         return code;
     }
 
-    synchronized boolean isThereUnvisitedNeighborsG() { //Вариант функции для генератора лабиринтов
-        boolean yes = false;
-        if (leftCell != null) yes = !leftCell.visited; //yes всегда ложное?
-        if (upCell != null) yes = yes || !upCell.visited;
-        if (rightCell != null) yes = yes || !rightCell.visited;
-        if (downCell != null) yes = yes || !downCell.visited;
-        return yes;
+    synchronized int isThereUnvisitedNeighborsG() { //Вариант функции для генератора лабиринтов
+        int num = 0;
+        if (leftCell != null && !leftCell.visited) num++;
+        if (upCell != null && !upCell.visited) num++;
+        if (rightCell != null && !rightCell.visited) num++;
+        if (downCell != null && !downCell.visited) num++;
+        return num;
     }
 
     boolean isThereUnvisitedNeighborsPF() { //Вариант функции для поиска пути
