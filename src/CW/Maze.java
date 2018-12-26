@@ -1,6 +1,7 @@
 package CW;
 
 import java.util.Stack;
+import java.util.concurrent.Semaphore;
 
 public class Maze {
     private int size_h;
@@ -51,7 +52,14 @@ public class Maze {
     }
 
 
-    public synchronized void print() {
+    private static final Semaphore SEMAPHORE = new Semaphore(1, true);
+
+    public void print() {
+        try {
+            SEMAPHORE.acquire();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         for (int i = 0; i < size_h; i++) {
             for (int j = 0; j < size_w; j++) {
                 switch (maze[i][j].wallCode()) {
@@ -107,6 +115,7 @@ public class Maze {
             }
             System.out.println();
         }
+        SEMAPHORE.release();
     }
 
     void makeAllUnvisited() {

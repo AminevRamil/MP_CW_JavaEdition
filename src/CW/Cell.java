@@ -35,23 +35,23 @@ class Cell {
         return cell2;
     }
 
-    void makeWall(Cell cell2) {
-        if (leftCell != null && leftCell == cell2) {
-            leftWall = true;
-            cell2.rightWall = true;
-        } else if (upCell != null && upCell == cell2){
-            upWall = true;
-            cell2.downWall = true;
-        } else if (rightCell != null && rightCell == cell2) {
-            rightWall = true;
-            cell2.leftWall = true;
-        } else if (downCell != null && downCell == cell2){
-            downWall = true;
-            cell2.upWall = true;
-        } else {
-            System.out.println("Странное поведение метода Cell.makeWall");
-        }
-    }
+//    void makeWall(Cell cell2) {
+//        if (leftCell != null && leftCell == cell2) {
+//            leftWall = true;
+//            cell2.rightWall = true;
+//        } else if (upCell != null && upCell == cell2){
+//            upWall = true;
+//            cell2.downWall = true;
+//        } else if (rightCell != null && rightCell == cell2) {
+//            rightWall = true;
+//            cell2.leftWall = true;
+//        } else if (downCell != null && downCell == cell2){
+//            downWall = true;
+//            cell2.upWall = true;
+//        } else {
+//            System.out.println("Странное поведение метода Cell.makeWall");
+//        }
+//    }
 
     synchronized void makePass(Cell cell2) {
         if (leftCell == cell2) {
@@ -89,13 +89,13 @@ class Cell {
         return num;
     }
 
-    boolean isThereUnvisitedNeighborsPF() { //Вариант функции для поиска пути
-        boolean yes = false;
-        if (leftCell != null) yes = !leftCell.visited && !leftWall; //обдумать порядок действий
-        if (upCell != null) yes = yes || (!upCell.visited && !upWall);
-        if (rightCell != null) yes = yes || (!rightCell.visited && !rightWall);
-        if (downCell != null) yes = yes || (!downCell.visited && !downWall);
-        return yes;
+    int isThereUnvisitedNeighborsPF() { //Вариант функции для поиска пути
+        int num = 0;
+        if (leftCell != null && !leftCell.visited && !leftWall) num++; //обдумать порядок действий
+        if (upCell != null && !upCell.visited && !upWall) num++;
+        if (rightCell != null && !rightCell.visited && !rightWall) num++;
+        if (downCell != null && !downCell.visited && !downWall) num++;
+        return num;
     }
 
     Cell getUnvisitedNeighborG() {
